@@ -15,7 +15,7 @@ FROM deps AS build
 COPY . .
 RUN yarn workspace @chess/backend prisma:generate
 RUN yarn workspace @chess/backend build
-RUN ls -la /app/apps/backend/dist/
+RUN ls -la /app/apps/backend/dist/ && echo "cache-bust-v2"
 FROM base AS runtime
 ENV NODE_ENV=production
 ENV STOCKFISH_PATH=/usr/games/stockfish
