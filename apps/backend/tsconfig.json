@@ -20,8 +20,8 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "@chess/shared": ["../../packages/shared/src/index.ts"],
-      "@chess/shared/*": ["../../packages/shared/src/*"]
+      "@chess/shared": ["../../packages/shared/dist/index.js"],
+      "@chess/shared/*": ["../../packages/shared/dist/*"]
     }
   },
   "include": ["src", "test"]
