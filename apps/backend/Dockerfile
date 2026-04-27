@@ -19,7 +19,7 @@ RUN yarn workspace @chess/backend prisma:generate
 WORKDIR /app/apps/backend
 RUN npx nest build
 WORKDIR /app
-RUN ls -la /app/apps/backend/dist/ && echo "cache-bust-v3"
+RUN find /app/apps/backend/dist -name "main.js" && echo "cache-bust-v4"
 
 FROM base AS runtime
 ENV NODE_ENV=production
@@ -34,4 +34,4 @@ COPY --from=build /app/apps/backend/prisma ./apps/backend/prisma
 COPY --from=build /app/package.json /app/yarn.lock ./
 EXPOSE 4000
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/backend/prisma/schema.prisma || npx prisma db push --schema=apps/backend/prisma/schema.prisma --accept-data-loss && node apps/backend/dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/backend/prisma/schema.prisma || npx prisma db push --schema=apps/backend/prisma/schema.prisma --accept-data-loss && node apps/backend/dist/apps/backend/src/main.js"]
