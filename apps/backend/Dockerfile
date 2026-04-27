@@ -27,6 +27,7 @@ ENV STOCKFISH_PATH=/usr/games/stockfish
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
+COPY --from=build /app/packages/shared/src /app/packages/shared/src
 COPY --from=build /app/apps/backend/dist /app/apps/backend/dist
 COPY --from=build /app/apps/backend/node_modules ./apps/backend/node_modules
 COPY --from=build /app/apps/backend/package.json ./apps/backend/package.json
