@@ -5,17 +5,22 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 RUN npm install -g yarn@1.22.22 --force
 WORKDIR /app
+
 FROM base AS deps
 COPY package.json yarn.lock .yarnrc ./
 COPY apps/backend/package.json apps/backend/package.json
 COPY apps/frontend/package.json apps/frontend/package.json
 COPY packages/shared/package.json packages/shared/package.json
 RUN yarn install --frozen-lockfile --ignore-engines --network-timeout 600000
+
 FROM deps AS build
 COPY . .
 RUN yarn workspace @chess/backend prisma:generate
-RUN cd apps/backend && npx nest build
-RUN ls -la /app/apps/backend/dist/ && echo "cache-bust-v2"
+WORKDIR /app/apps/backend
+RUN npx nest build
+WORKDIR /app
+RUN ls -la /app/apps/backend/dist/ && echo "cache-bust-v3"
+
 FROM base AS runtime
 ENV NODE_ENV=production
 ENV STOCKFISH_PATH=/usr/games/stockfish
