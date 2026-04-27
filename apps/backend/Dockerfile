@@ -16,10 +16,10 @@ RUN yarn install --frozen-lockfile --ignore-engines --network-timeout 600000
 FROM deps AS build
 COPY . .
 RUN yarn workspace @chess/backend prisma:generate
+RUN yarn workspace @chess/shared build || true
 WORKDIR /app/apps/backend
 RUN npx nest build
 WORKDIR /app
-RUN find /app/apps/backend/dist -name "main.js" && echo "cache-bust-v4"
 
 FROM base AS runtime
 ENV NODE_ENV=production
