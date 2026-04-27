@@ -32,4 +32,4 @@ COPY --from=build /app/apps/backend/prisma ./apps/backend/prisma
 COPY --from=build /app/package.json /app/yarn.lock ./
 EXPOSE 4000
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sh", "-c", "cd apps/backend && npx prisma migrate deploy || npx prisma db push --accept-data-loss; node dist/main.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/backend/prisma/schema.prisma || npx prisma db push --schema=apps/backend/prisma/schema.prisma --accept-data-loss && node apps/backend/dist/main.js"]
