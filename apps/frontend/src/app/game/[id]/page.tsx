@@ -9,12 +9,15 @@ import { EvalBar } from '@/components/EvalBar';
 import { useSession } from '@/lib/store';
 import { getSocket } from '@/lib/socket';
 import { api } from '@/lib/api';
+import { sfx } from '@/lib/sounds';
+import { useSettings } from '@/lib/settings';
 import type { GameState, ServerEvent } from '@chess/shared';
 
 export default function GamePage() {
   const params = useParams<{ id: string }>();
   const gameId = params.id;
   const { token, user, hydrate } = useSession();
+  const { soundEnabled, hydrate: hydrateSettings } = useSettings();
   const [state, setState] = useState<GameState | null>(null);
   const [evalScore, setEvalScore] = useState<number | null>(null);
   const [showEval, setShowEval] = useState(false);
@@ -27,7 +30,29 @@ export default function GamePage() {
   const [blackClock, setBlackClock] = useState(0);
   const tickRef = useRef<number | null>(null);
 
-  useEffect(() => { hydrate(); }, [hydrate]);
+  useEffect(() => { hydrate(); hydrateSettings(); }, [hydrate, hydrateSettings]);
+
+  // Play sounds whenever the position advances. Compares previous and new
+  // PGN length so we react to opponent moves and engine moves equally.
+  const lastPliesRef = useRef(0);
+  useEffect(() => {
+    if (!state || !soundEnabled) return;
+    const tmp = new Chess();
+    tmp.loadPgn(state.pgn || '', { strict: false });
+    const plies = tmp.history().length;
+    if (plies > lastPliesRef.current) {
+      const last = tmp.history({ verbose: true }).pop();
+      if (last) {
+        if (state.status !== 'in_progress') sfx.end();
+        else if (last.san?.includes('+') || last.san?.includes('#')) sfx.check();
+        else if (last.captured) sfx.capture();
+        else sfx.move();
+      }
+    } else if (plies < lastPliesRef.current && state.status !== 'in_progress') {
+      sfx.end();
+    }
+    lastPliesRef.current = plies;
+  }, [state, soundEnabled]);
 
   useEffect(() => {
     if (!token || !gameId) return;
@@ -178,9 +203,6 @@ export default function GamePage() {
             boardOrientation={boardOrientation}
             onPieceDrop={(from: string, to: string) => onDrop(from, to)}
             arePiecesDraggable={!gameOver && !!myColor}
-            customBoardStyle={{ borderRadius: 8, boxShadow: '0 0 0 1px rgba(255,255,255,0.06)' }}
-            customDarkSquareStyle={{ backgroundColor: '#b58863' }}
-            customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
           />
         </div>
         <div className="flex items-center justify-between">

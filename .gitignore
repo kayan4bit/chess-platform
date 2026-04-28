@@ -14,3 +14,8 @@ coverage
 .env.*.local
 !.env.example
 prisma/migrations/dev.db*
+
+# SQLite runtime data (created at runtime / mounted from persistent disk)
+apps/backend/prisma/data/
+*.db
+*.db-journal

@@ -1,0 +1,26 @@
+# UCX Chess — system requirements
+#
+# This is a JS/TypeScript monorepo, so dependencies are tracked in package.json
+# and yarn.lock. This file documents the *system-level* prerequisites you need
+# to run UCX Chess locally or in a container.
+#
+# ---- Required ----
+node>=20.0.0          # JavaScript runtime
+yarn==1.22.22         # Package manager (Yarn Classic — pinned via packageManager)
+stockfish>=15         # UCI chess engine (apt: stockfish; brew: stockfish)
+sqlite3>=3.30         # Bundled with Prisma; system install only needed for ad-hoc inspection
+openssl>=1.1          # TLS + bcrypt acceleration on the backend
+
+# ---- Optional ----
+redis>=6              # Optional. Cross-instance matchmaking queue when REDIS_URL is set.
+docker>=24            # If you prefer to run via Dockerfile (apps/backend/Dockerfile).
+
+# ---- Auto-heal CLI (yarn heal) ----
+# Set this env var to enable LLM-driven self-healing on lint/typecheck failures.
+# Get a key at https://openrouter.ai — any model with diff-output works.
+# OPENROUTER_API_KEY=sk-or-...
+
+# ---- Hosting prerequisites ----
+# Render: starter plan (for the persistent disk that holds chess.db)
+# Fly.io:  hobby plan with a 3 GB volume mounted at /data
+# Cloudflare Pages: free plan; uses @cloudflare/next-on-pages adapter

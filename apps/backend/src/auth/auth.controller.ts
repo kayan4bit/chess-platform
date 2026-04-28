@@ -1,6 +1,10 @@
-import { Controller, Get, Headers, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
+
+interface SignupDto { username: string; password: string }
+interface LoginDto { username: string; password: string }
+interface UpgradeDto { username: string; password: string }
 
 @Controller('auth')
 export class AuthController {
@@ -9,6 +13,23 @@ export class AuthController {
   @Post('guest')
   async guest() {
     return this.auth.createGuest();
+  }
+
+  @Post('signup')
+  async signup(@Body() body: SignupDto) {
+    return this.auth.signup(body?.username ?? '', body?.password ?? '');
+  }
+
+  @Post('login')
+  async login(@Body() body: LoginDto) {
+    return this.auth.login(body?.username ?? '', body?.password ?? '');
+  }
+
+  @Post('upgrade')
+  async upgrade(@Headers('authorization') authHeader: string | undefined, @Body() body: UpgradeDto) {
+    if (!authHeader?.startsWith('Bearer ')) throw new UnauthorizedException('Missing bearer token');
+    const payload = this.auth.verify(authHeader.slice('Bearer '.length));
+    return this.auth.upgradeGuest(payload.sub, body?.username ?? '', body?.password ?? '');
   }
 
   @Get('me')
