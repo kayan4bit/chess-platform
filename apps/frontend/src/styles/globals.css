@@ -15,4 +15,5 @@ a { @apply text-brand hover:text-emerald-400; }
 }
 .btn-outline { @apply inline-flex items-center justify-center rounded-md px-4 py-2 font-medium border border-neutral-700 hover:border-neutral-500 hover:bg-neutral-900 transition; }
 .card { @apply rounded-lg border border-neutral-800 bg-neutral-900/60 p-4; }
+.card-soft { @apply rounded-md border border-neutral-800 bg-neutral-900/40 transition; }
 .input { @apply rounded-md bg-neutral-800 border border-neutral-700 px-3 py-2 focus:outline-none focus:border-brand; }

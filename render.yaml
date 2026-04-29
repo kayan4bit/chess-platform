@@ -26,7 +26,11 @@ services:
       - key: JWT_SECRET
         generateValue: true # persisted by Render across restarts
       - key: DATABASE_URL
-        value: file:./data/chess.db
+        # Absolute path that matches the persistent disk mount above.
+        # If you have a stale DATABASE_URL set in the Render dashboard
+        # (e.g. left over from a previous Postgres database), DELETE it
+        # there — dashboard values override render.yaml.
+        value: file:/app/apps/backend/prisma/data/chess.db
       - key: STOCKFISH_PATH
         value: /usr/games/stockfish
       - key: BOT_FALLBACK_MS

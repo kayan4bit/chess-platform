@@ -23,8 +23,8 @@ export function Nav() {
     <header className="border-b border-neutral-900 bg-neutral-950/80 backdrop-blur sticky top-0 z-10">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-6">
         <Link href="/" className="font-bold text-lg text-white flex items-center gap-2">
-          <span aria-hidden>♞</span>
-          <span>Chess</span>
+          <span aria-hidden className="text-brand">♞</span>
+          <span>UCX Chess</span>
         </Link>
         <nav className="flex gap-4 text-sm text-neutral-300">
           <Link href="/play" className="hover:text-white transition">Play</Link>

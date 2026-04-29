@@ -24,7 +24,10 @@ WORKDIR /app
 FROM base AS runtime
 ENV NODE_ENV=production
 ENV STOCKFISH_PATH=/usr/games/stockfish
-ENV DATABASE_URL=file:./data/chess.db
+# Default to absolute path so the value is the same locally and in
+# Render/Fly. Render mounts a persistent disk on top of this directory,
+# Fly mounts a volume; either way the .db file survives redeploys.
+ENV DATABASE_URL=file:/app/apps/backend/prisma/data/chess.db
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
@@ -39,4 +42,4 @@ COPY --from=build /app/package.json /app/yarn.lock ./
 RUN mkdir -p /app/apps/backend/prisma/data
 EXPOSE 4000
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sh", "-c", "npx prisma migrate deploy --schema=apps/backend/prisma/schema.prisma || npx prisma db push --schema=apps/backend/prisma/schema.prisma --accept-data-loss && node apps/backend/dist/apps/backend/src/main.js"]
+CMD ["sh", "-c", "echo \"[boot] DATABASE_URL=$DATABASE_URL\" && npx prisma db push --schema=apps/backend/prisma/schema.prisma --accept-data-loss --skip-generate && node apps/backend/dist/apps/backend/src/main.js"]
