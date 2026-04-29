@@ -1,0 +1,48 @@
+app = "chess-platform-backend"
+primary_region = "ord"
+
+[build]
+  dockerfile = "apps/backend/Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "4000"
+  STOCKFISH_PATH = "/usr/games/stockfish"
+  DATABASE_URL = "file:/data/chess.db"
+  BOT_FALLBACK_MS = "15000"
+  BOT_FALLBACK_LEVEL = "6"
+
+# Persistent volume — free 3GB on the Hobby plan. Survives every deploy.
+[mounts]
+  source = "chess_data"
+  destination = "/data"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 4000
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+
+  [[services.http_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "get"
+    path = "/health"
+    protocol = "http"

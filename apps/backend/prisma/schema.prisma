@@ -2,8 +2,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Privacy-first: data lives in a single SQLite file under DATABASE_URL.
+// Default for local dev is `file:./data/chess.db` (relative to apps/backend/prisma).
+// Passwords are bcrypt-hashed before being stored — the database never sees plaintext.
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -31,7 +34,7 @@ model Game {
   black         User     @relation("BlackPlayer", fields: [blackId], references: [id])
   pgn           String   @default("")
   fen           String   @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-  status        String   @default("in_progress") // in_progress | white_win | black_win | draw | aborted
+  status        String   @default("in_progress")
   endReason     String?
   initialTimeMs Int      @default(180000)
   incrementMs   Int      @default(2000)

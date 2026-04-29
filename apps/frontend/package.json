@@ -8,10 +8,12 @@
     "start": "next start -p 3000",
     "lint": "next lint --max-warnings=0",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "pages:build": "npx @cloudflare/next-on-pages@1",
+    "pages:deploy": "npx @cloudflare/next-on-pages@1 && npx wrangler pages deploy .vercel/output/static --project-name chess-frontend",
     "test": "echo no-tests"
   },
   "dependencies": {
-    "@chess/shared": "workspace:*",
+    "@chess/shared": "*",
     "chess.js": "^1.0.0-beta.8",
     "clsx": "^2.1.1",
     "next": "14.2.15",

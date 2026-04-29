@@ -1,0 +1,73 @@
+# Place this file at .github/workflows/promote-run.yml in the GitHub web editor
+# (OAuth pushes can't write to .github/workflows/, but the web editor can).
+#
+# It runs the standard verify pipeline on every PR, and on push to main it
+# additionally runs the self-heal loop (which sends failing files to OpenRouter
+# for an auto-patch) and pushes any resulting fix commit back to the branch.
+#
+# Required repo secrets:
+#   OPENROUTER_API_KEY  — your OpenRouter API key (used by `yarn heal`)
+
+name: Promote / Self-Heal
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  verify-and-heal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install yarn 1.22.22
+        run: npm install -g yarn@1.22.22
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-engines
+
+      - name: Prisma generate
+        working-directory: apps/backend
+        run: npx prisma generate
+
+      - name: Run verify pipeline (typecheck + lint + build + test)
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+          NEXT_PUBLIC_WS_URL: http://localhost:4000
+        run: yarn verify
+
+      - name: Auto-heal on failure
+        if: failure() && github.event_name == 'push'
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -z "$OPENROUTER_API_KEY" ]; then
+            echo "OPENROUTER_API_KEY not set in repo secrets — skipping self-heal."
+            exit 1
+          fi
+          yarn heal || true
+
+      - name: Commit + push self-heal fix
+        if: failure() && github.event_name == 'push'
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "ucx-chess-bot"
+            git config user.email "ucx-chess-bot@users.noreply.github.com"
+            git add -A
+            git commit -m "chore(heal): auto-patch from \`yarn heal\` (Promote workflow)"
+            git push origin HEAD:${{ github.ref_name }}
+          fi

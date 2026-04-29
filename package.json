@@ -1,18 +1,30 @@
 {
-  "name": "chess-platform",
+  "name": "ucx-chess",
   "private": true,
-  "version": "0.1.0",
-  "description": "Open-source chess platform (Lichess-style) with real-time multiplayer, Stockfish AI, matchmaking, Elo, and analysis.",
-  "packageManager": "pnpm@9.15.1",
+  "version": "1.0.0",
+  "description": "UCX Chess — a privacy-first, open-source chess platform. A UCX project, founded 2023 by Kayan Erkama. Real-time multiplayer, Stockfish bot personalities, and post-game analysis.",
+  "author": "Kayan Erkama (UCX project)",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/kayan4bit/chess-platform",
+  "packageManager": "yarn@1.22.22",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev:backend": "pnpm --filter @chess/backend dev",
-    "dev:frontend": "pnpm --filter @chess/frontend dev",
-    "build": "pnpm -r build",
-    "build:backend": "pnpm --filter @chess/backend build",
-    "build:frontend": "pnpm --filter @chess/frontend build",
-    "lint": "pnpm -r lint",
-    "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "dev:backend": "yarn workspace @chess/backend dev",
+    "dev:frontend": "yarn workspace @chess/frontend dev",
+    "build": "yarn workspaces run build",
+    "build:backend": "yarn workspace @chess/backend build",
+    "build:frontend": "yarn workspace @chess/frontend build",
+    "lint": "yarn workspaces run lint",
+    "test": "yarn workspaces run test",
+    "typecheck": "yarn workspaces run typecheck",
+    "verify": "yarn typecheck && yarn lint && yarn test && yarn build",
+    "heal": "node scripts/heal.mjs",
+    "heal:dry": "node scripts/heal.mjs --dry-run",
+    "prisma:generate": "yarn workspace @chess/backend prisma:generate",
+    "format": "echo formatting-noop"
   },
   "engines": {
     "node": ">=20"

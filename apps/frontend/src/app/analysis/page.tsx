@@ -86,7 +86,7 @@ function AnalysisPageInner() {
       </div>
       <div className="space-y-3">
         <div className="aspect-square">
-          <Board position={displayFen} arePiecesDraggable={false} boardOrientation="white" customDarkSquareStyle={{ backgroundColor: '#b58863' }} customLightSquareStyle={{ backgroundColor: '#f0d9b5' }} />
+          <Board position={displayFen} arePiecesDraggable={false} boardOrientation="white" />
         </div>
         {analysis && (
           <div className="flex items-center gap-2">
